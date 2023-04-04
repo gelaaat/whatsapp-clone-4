@@ -1,0 +1,7 @@
+GET http://localhost:8000/api/getContactMessages
+Content-Type: application/json
+
+{
+  "contactId": "642c70fe3e14bbb82052b472",
+  "limit": 10
+}
