@@ -1,21 +1,27 @@
-import User from "../models/User.js"
+import Conversation from "../models/Conversation.js"
 
 export const getContactMessages = async (req, res, next) => {
-  const { id } = req.user
-  const { contactId, limit } = req.body
+  const { _id:userId } = req.user
+  const { conversationId, limit } = req.body
+
 
   try {
-    const contact = await User.findById(contactId)
     
-    const userMessages = await User.findById(id).populate('messages').find({
-      transmitterUser: req.user,
-      receiverUser: contact
-    }).limit(limit)
+    const conversation = await Conversation.findById(conversationId).populate({
+      path: 'messages',
+      options: {
+        limit: limit,
+        sort: { date: 1 }
+      }
+    })
 
-    res.stauts(200).json(userMessages)
+    res.status(200).json(conversation)
 
   } catch (error) {
-    res.status(404).json({ msg: 'Something gone wrong retrieving the user messages' })
+    res.status(404).json({
+      msg: 'Something gone wrong retrieving the user messages',
+      error
+    })
   }
   
 }

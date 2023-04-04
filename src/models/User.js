@@ -8,9 +8,9 @@ const UserSchema = new Schema({
     type: Schema.ObjectId,
     ref: 'User'
   }],
-  messages: [{
+  conversations: [{
     type: Schema.ObjectId,
-    ref: 'Messages'
+    ref: 'Conversation'
   }],
   pendingRequestContact: [{
     type: Schema.ObjectId,

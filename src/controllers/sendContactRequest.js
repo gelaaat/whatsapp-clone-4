@@ -7,16 +7,14 @@ export const sendContactRequest = async (req, res, next) => {
   try {
     const contact = await User.findById(contactId)
 
-    if(!contact) { return res.status(404).json({ msg:'Contact not found' }) }
+    if(!contact) { return res.status(404).json({ msg:'This contacts not exists' }) }
 
-    const updatedUser = await User.findByIdAndUpdate(userId, {
-      contacts: contact
-    })
+    contact.pendingRequestContact = contact.pendingRequestContact.concat(userId)
+    await contact.save()
 
-    res.status(201).json({ msg: 'Request sended Succesfull' })
-  } catch (err) {
-    res.status(500).json({ msg: 'Something gone wrong sending the request' })
+    res.status(201).json({ msg: 'Request sended successfully' })
+
+  } catch (error) {
+    next(new Error('Something gone wrong sending de friend request'))
   }
-  
-
 }

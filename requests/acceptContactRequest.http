@@ -1,0 +1,6 @@
+POST http://localhost:8000/api/acceptContactRequest
+Content-Type: application/json
+
+{
+  "contactId": "642c977bf308a6a2eb05abf1"
+}

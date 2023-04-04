@@ -1,31 +1,29 @@
+import Conversation from "../models/Conversation.js";
 import Messages from "../models/Messages.js";
-import User from "../models/User.js";
 
 export const sendMessage = async (req, res, next) => {
-  const { message, contactId } = req.body
+  const { message, conversationId } = req.body
   const { _id:userId } = req.user
 
   try {
+    const conversation = await Conversation.findById(conversationId)
 
-    const user = await User.findById(userId)
-    const contact = await User.findById(contactId)
-    
+    const receiver = JSON.stringify(userId) === JSON.stringify(conversation.users[0]) ? conversation.users[1] : userId
+
     const newMessage = new Messages({
       message,
-      date: `${new Date().getHours()}:${new Date().getMinutes()}`,
+      date: `${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`,
       transmitterUser: userId,
-      receiverUser: contact._id
-
+      receiverUser: receiver
     })
 
     await newMessage.save()
-    user.messages = user.messages.concat(newMessage)
-    contact.messages = contact.messages.concat(newMessage)
     
-    await user.save()
-    await contact.save()
+    conversation.messages = conversation.messages.concat(newMessage)
 
-    res.status(201).send(newMessage)
+    await conversation.save()
+
+    res.status(201).send(conversation)
   } catch (error) {
     res.status(500).json({ msg: 'Something gone wrong sending the message' })
   }

@@ -5,6 +5,7 @@ import { createUser } from '../controllers/createUser.js'
 import { sendContactRequest } from '../controllers/sendContactRequest.js'
 import { getContactMessages } from '../controllers/getContactMessages.js'
 import { sendMessage } from '../controllers/sendMessage.js'
+import { acceptRequestContact } from '../controllers/acceptContactRequest.js'
 
 const router = express.Router()
 
@@ -26,10 +27,11 @@ router.post('/register-local', createUser)
 
 //Contacts
 router.post('/addContact', isAuth, sendContactRequest)
+router.post('/acceptContactRequest', isAuth, acceptRequestContact)
 
+
+//Messages
 router.post('/sendMessage', isAuth, sendMessage)
-
-
 router.get('/getContactMessages', isAuth, getContactMessages)
 
 
