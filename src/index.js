@@ -10,17 +10,30 @@ import './passport/index.js'
 import { db } from './db/index.js'
 import { fileURLToPath } from 'url'
 import path from 'path'
+import cookieParser from 'cookie-parser'
 
 const app = express()
 dotenv.config()
 db()
 
 // Configuracions
-app.use(cors())
-app.use(helmet())
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
+const whitelist = ["http://localhost:3000"]
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin || whitelist.indexOf(origin) !== -1) {
+      callback(null, true)
+    } else {
+      callback(new Error("Not allowed by CORS"))
+    }
+  },
+  credentials: true,
+}
 
+app.use(cors(corsOptions))
+app.use(helmet())
+app.use(express.urlencoded({ extended: true }))
+app.use(express.json())
+app.use(cookieParser(process.env.SECRET_SESSION))
 
 
 //Set the client
@@ -37,15 +50,17 @@ const sessionStore = MongoStore.create({
 
 app.use(session({
   secret: process.env.SECRET_SESSION,
-  resave: false,
+  resave: true,
   saveUninitialized: true,
   cookie: {
     secure: false, // Es posa a true quan estiguem en produccio
     maxAge: 1000 * 60 * 60 * 24,
-    sameSite: true
+    sameSite: false
   },
   store: sessionStore
 }))
+
+
 
 app.use(passport.initialize())
 app.use(passport.session())

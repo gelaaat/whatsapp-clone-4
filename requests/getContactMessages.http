@@ -1,7 +1,7 @@
-GET http://localhost:8000/api/getContactMessages
+GET http://localhost:8000/api/getConversation
 Content-Type: application/json
 
 {
-  "conversationId": "642c9d678bd0add8aeae2383",
+  "contactId": "64320a638d183ce124a01962",
   "limit": 2
 }

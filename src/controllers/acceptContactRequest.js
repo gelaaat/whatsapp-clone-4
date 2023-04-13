@@ -6,31 +6,47 @@ export const acceptRequestContact = async (req, res, next) => {
   const { contactId } = req.body
 
   try {
-    const contact = await User.findById(contactId)
 
-    if(!contact) { return res.status(404).json({ msg:'Contact not found' }) }
-
+    const contact = await User.findById(contactId)    
     const user = await User.findById(userId)
-
-    user.contacts = user.contacts.concat(contact)
-    contact.contacts = contact.contacts.concat(user)
-
     
+    if (!contact) { return res.status(404).json({ message: 'Contact not found' }) }
+    else if (!user.pendingRequestContacts.includes(contact._id)) {
+      res.status(400).json({
+        message: 'You don\'t have his request friend or you just already accepted'
+      })
+    }
+    else {
+     
+      user.contacts.push(contact)
+      contact.contacts.push(user)           
 
-    const newConversation = new Conversation({
-      dateInitial: `${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`,
-      users: [user, contact]
-    })
+      user.pendingRequestContacts = user.pendingRequestContacts.filter(request => {
+        return !request._id.equals(contact._id)
+      })   
 
-    user.conversations = user.conversations.concat(newConversation)
-    contact.conversations = contact.conversations.concat(newConversation)
+      contact.sendedRequestContacts = contact.sendedRequestContacts.filter(request => {
+        return !request._id.equals(user._id)
+      })
 
-    await user.save()
-    await contact.save()
-    await newConversation.save()
-    
-    res.status(201).json({ msg: 'Request accepted Succesfully' })
+      const newConversation = new Conversation({
+        dateInitial: `${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`,
+        users: [user, contact]
+      })
+
+      user.conversations.push(newConversation)
+      contact.conversations.push(newConversation)
+
+      await user.save()
+      await contact.save()
+      await newConversation.save()
+
+      res.status(201).json({
+        conversation: newConversation._id
+      })
+    }
+
   } catch (err) {
-    res.status(500).json({ msg: 'Something gone wrong accepting the request' })
+    res.status(500).json({ message: 'Something gone wrong accepting the request' })
   }
 }

@@ -25,6 +25,6 @@ export const sendMessage = async (req, res, next) => {
 
     res.status(201).send(conversation)
   } catch (error) {
-    res.status(500).json({ msg: 'Something gone wrong sending the message' })
+    res.status(500).json({ message: 'Something gone wrong sending the message' })
   }
 }

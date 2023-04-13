@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt'
 
-export const verifyPassword = async (user, password) => {
+export const verifyPassword = (user, password) => {
   const { hash } = user
-  const varified = await bcrypt.compare(hash, password)
+  const varified = bcrypt.compareSync(password, hash)
   return varified
 }
